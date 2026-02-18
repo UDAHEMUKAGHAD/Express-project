@@ -1,0 +1,40 @@
+<html>
+  <body>
+<h2>Dashboard</h2>
+
+<p><b>Current Time:</b> <span id="time"></span></p>
+<p><b>Session Remaining:</b> <span id="remain"></span> seconds</p>
+
+<a href="/logout">Logout</a>
+
+<script>
+  async function loadSessionInfo() {
+    const res = await fetch("/session-info");
+
+    // if session expired
+    if (res.status === 401) {
+      alert("Session expired! Login again.");
+      window.location.href = "/login";
+      return;
+    }
+
+    const data = await res.json();
+
+    document.getElementById("time").innerText = data.currentTime;
+    document.getElementById("remain").innerText = data.remainingSeconds;
+
+    // if remaining time finished
+    if (data.remainingSeconds <= 0) {
+      alert("Session expired! Login again.");
+      window.location.href = "/login";
+    }
+  }
+
+  // load immediately
+  loadSessionInfo();
+
+  // update every 1 second
+  setInterval(loadSessionInfo, 1000);
+</script>
+</body>
+</html>
